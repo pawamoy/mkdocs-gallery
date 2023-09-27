@@ -30,7 +30,7 @@ done
 
 echo "Taking screenshots"
 for theme in site/themes/*; do
-    shot-scraper --wait 1000 "${theme}/index.html" -o "docs/img/${theme##*/}.png"
+    shot-scraper "${theme}/index.html" -o "docs/img/${theme##*/}.png"
 done
 
 echo "Building main documentation"
