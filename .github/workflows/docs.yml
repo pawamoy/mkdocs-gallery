@@ -41,6 +41,7 @@ jobs:
         name: Cache/restore pip data
         with:
           path: ~/.cache/pip
+          key: pip
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt
@@ -49,6 +50,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/ms-playwright/
+          key: playwright
 
       - name: Install Playwright dependencies
         run: shot-scraper install
