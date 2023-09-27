@@ -46,6 +46,7 @@ for name, theme in themes:
 
 # Our main MkDocs configuration.
 main_conf = f"""site_name: Gallery
+site_url: https://pawamoy.github.io/mkdocs-gallery
 theme:
   name: material
   features:
