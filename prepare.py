@@ -75,6 +75,7 @@ img {
 </style>
 """
 
+Path("docs").mkdir(parents=True, exist_ok=True)
 with open("docs/index.md", "w") as index_page:
     print(index_contents, file=index_page)
     for name, theme in themes:
