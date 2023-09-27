@@ -31,22 +31,42 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Install Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-      - name: Install dependencies
+
+      - uses: actions/cache@v3
+        name: Cache/restore pip data
+        with:
+          path: ~/.cache/pip
+
+      - name: Install Python dependencies
         run: pip install -r requirements.txt
+
+      - name: Cache/restore Playwright browsers
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright/
+
+      - name: Install Playwright dependencies
+        run: shot-scraper install
+
       - name: Prepare themes
         run: python prepare.py
+
       - name: Build everything
         run: bash build.sh
+
       - name: Setup Pages
         uses: actions/configure-pages@v3
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
           path: site
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2

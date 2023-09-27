@@ -50,10 +50,34 @@ theme:
   name: material
   features:
   - navigation.sections
-nav:
-- Themes:
-{conf_nav_themes}
 """
 
 with open("mkdocs.yml", "w") as conf_file:
-    print(main_conf.replace("../", "themes/"), file=conf_file)
+    print(main_conf, file=conf_file)
+
+
+# The home page.
+index_contents = """---
+hide:
+- navigation
+---
+
+# Welcome to our gallery of MkDocs themes
+
+<style>
+img {
+    -webkit-filter: drop-shadow(0px 16px 10px rgba(100,100,100,0.6));
+    -moz-filter: drop-shadow(0px 16px 10px rgba(100,100,100,0.6));
+    -ms-filter: drop-shadow(0px 16px 10px rgba(100,100,100,0.6)); 
+    -o-filter: drop-shadow(0px 16px 10px rgba(100,100,100,0.6));
+    filter: drop-shadow(0px 16px 10px rgba(100,100,100,0.6));
+}
+</style>
+"""
+
+with open("docs/index.md", "w") as index_page:
+    print(index_contents, file=index_page)
+    for name, theme in themes:
+        img = f"![{name}](../../img/{theme}.png)"
+        link = f"[{img}](themes/{theme})"
+        print(f"## {name}\n\n{link}\n\n---\n\n", file=index_page)

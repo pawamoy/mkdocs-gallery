@@ -13,11 +13,8 @@ done
 
 wait
 
-echo "Building main documentation"
 rm -rf site
-mkdocs build
-mkdir site/themes
-mkdir logs &>/dev/null
+mkdir -p logs docs/img site/themes &>/dev/null
 
 for theme in themes/*; do
     echo "Building ${theme}"
@@ -30,3 +27,11 @@ for theme in themes/*; do
         fi
     )
 done
+
+echo "Taking screenshots"
+for theme in site/themes/*; do
+    shot-scraper --wait 1000 "${theme}/index.html" -o "docs/img/${theme##*/}.png"
+done
+
+echo "Building main documentation"
+mkdocs build --dirty

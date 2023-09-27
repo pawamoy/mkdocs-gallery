@@ -1,3 +1,4 @@
 httpx
 pyyaml
 mkdocs-material
+shot-scraper
