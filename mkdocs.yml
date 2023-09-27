@@ -1,0 +1,58 @@
+site_name: Gallery
+theme:
+  name: material
+  features:
+  - navigation.sections
+nav:
+- Themes:
+  - Alabaster: themes/alabaster
+  - Bootstrap: themes/bootstrap
+  - Bootstrap 4: themes/bootstrap4
+  - BOOTSTRAP386: themes/bootstrap386
+  - Bootstrap4: themes/bootstrap4
+  - Bootswatch - Cerulean: themes/cerulean
+  - Bootswatch - Cosmo: themes/cosmo
+  - Bootswatch - Cyborg: themes/cyborg
+  - Bootswatch - Darkly: themes/darkly
+  - Bootswatch - Flatly: themes/flatly
+  - Bootswatch - Journal: themes/journal
+  - Bootswatch - Litera: themes/litera
+  - Bootswatch - Lumen: themes/lumen
+  - Bootswatch - Lux: themes/lux
+  - Bootswatch - Materia: themes/materia
+  - Bootswatch - Minty: themes/minty
+  - Bootswatch - Pulse: themes/pulse
+  - Bootswatch - Sandstone: themes/sandstone
+  - Bootswatch - Simplex: themes/simplex
+  - Bootswatch - Slate: themes/slate
+  - Bootswatch - Solar: themes/solar
+  - Bootswatch - Spacelab: themes/spacelab
+  - Bootswatch - Superhero: themes/superhero
+  - Bootswatch - United: themes/united
+  - Bootswatch - Yeti: themes/yeti
+  - Cinder: themes/cinder
+  - Cluster: themes/cluster
+  - CustomMill: themes/custommill
+  - docSkimmer: themes/docskimmer
+  - Dracula: themes/dracula
+  - GitBook: themes/gitbook
+  - GitHub: themes/github
+  - Inspired: themes/inspired
+  - Ivory: themes/ivory
+  - Jinks: themes/jinks_en
+  - KPN for MkDocs: themes/kpn
+  - Lantana: themes/lantana
+  - Material for MkDocs: themes/material
+  - mkdocs-theme-topdf: themes/topdf
+  - Moonstone: themes/moonstone
+  - Nature: themes/nature
+  - Risonia: themes/risonia
+  - Semantic: themes/semantic
+  - Simple Blog: themes/simple-blog
+  - SWAN: themes/swan
+  - Terminal for MkDocs: themes/terminal
+  - Unidata: themes/unidata
+  - Windmill: themes/windmill
+  - Windmill Dark: themes/windmill-dark
+  - Zettelkasten: themes/zettelkasten-solarized-light
+

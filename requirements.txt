@@ -1,0 +1,3 @@
+httpx
+pyyaml
+mkdocs-material
