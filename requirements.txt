@@ -2,3 +2,4 @@ httpx
 pyyaml
 mkdocs-material
 shot-scraper
+jinja2

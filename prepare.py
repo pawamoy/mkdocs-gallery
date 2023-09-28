@@ -1,7 +1,20 @@
 from pathlib import Path
 from inspect import cleandoc as dedent
+from dataclasses import dataclass
+from jinja2 import Environment
+
 import httpx
 import yaml
+import shutil
+
+jinja = Environment(autoescape=False)
+
+@dataclass
+class Theme:
+    name: str
+    mkdocs_id: str
+    url: str = ""
+    pypi_id: str = ""
 
 
 # Fetch themes from MkDocs catalog.
@@ -11,37 +24,42 @@ theming_category = [project for project in projects if project["category"] == "t
 themes = []
 for project in theming_category:
     if mkdocs_theme := project.get("mkdocs_theme"):
+        if "github_id" in project:
+            url = f"https://github.com/{project['github_id']}"
+        elif "gitlab_id" in project:
+            url = f"https://gitlab.com/{project['gitlab_id']}"
+        else:
+            url = ""
+        pypi_id = project.get("pypi_id", f"git+{url}")
         if isinstance(mkdocs_theme, str):
-            themes.append((project["name"], mkdocs_theme))
+            themes.append(Theme(name=project["name"], url=url, pypi_id=pypi_id, mkdocs_id=mkdocs_theme))
         else:
             for theme in mkdocs_theme:
-                themes.append((f"{project['name']} - {theme.title()}", theme))
-themes = sorted(themes, key=lambda theme: theme[0].lower())
-
-
-# Pre-build list of themes in navigation.
-conf_nav_themes = "\n".join(f"  - {name}: ../{theme}" for name, theme in themes)
-
-
-# MkDocs configuration for each theme.
-theme_conf = """site_name: {site_name}
-theme: {theme}
-nav:
-- Gallery: ../../
-- Themes:
-""" + conf_nav_themes
+                themes.append(Theme(name=f"{project['name']} - {theme.title()}", url=url, pypi_id=pypi_id, mkdocs_id=theme))
+themes = sorted(themes, key=lambda theme: theme.name.lower())
+builtin_themes = [
+    Theme(name="MkDocs", mkdocs_id="mkdocs"),
+    Theme(name="ReadTheDocs", mkdocs_id="readthedocs"),
+]
 
 
 # Prepare each theme (docs directory and configuration file).
-for name, theme in themes:
-    theme_dir = Path("themes", theme)
-    theme_dir.mkdir(parents=True, exist_ok=True)
-    demo_docs_dir = Path("demo").absolute()
-    docs_dir = theme_dir / "docs"
-    if not docs_dir.exists():
-        docs_dir.symlink_to(demo_docs_dir, target_is_directory=True)
-    with theme_dir.joinpath("mkdocs.yml").open("w") as conf_file:
-        print(theme_conf.format(site_name=name, theme=theme), file=conf_file)
+specimen_dir = Path("specimen").absolute()
+for theme in builtin_themes + themes:
+    # Copy specific directory, or default to specimen.
+    theme_dir = Path("themes", theme.mkdocs_id)
+    theme_conf_dir = Path("themes_conf", theme.mkdocs_id)
+    if not theme_conf_dir.exists():
+        theme_conf_dir = specimen_dir
+    shutil.copytree(theme_conf_dir, theme_dir, dirs_exist_ok=True)
+
+    # Update mkdocs.yml.
+    mkdocs_yml = theme_dir / "mkdocs.yml"
+    mkdocs_yml.write_text(jinja.from_string(mkdocs_yml.read_text()).render(theme=theme.mkdocs_id, site_name=theme.name, themes=themes))
+
+    # Update docs/index.md.
+    index_md = theme_dir / "docs" / "index.md"
+    index_md.write_text(jinja.from_string(index_md.read_text()).render(theme=theme, themes=themes))
 
 
 # Our main MkDocs configuration.
@@ -49,12 +67,27 @@ main_conf = f"""site_name: Gallery
 site_url: https://pawamoy.github.io/mkdocs-gallery
 theme:
   name: material
-  features:
-  - navigation.sections
+  logo: assets/logo.png
+  palette:
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: blue
+    toggle:
+      icon: material/brightness-7 
+      name: Switch to dark mode
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: blue
+    toggle:
+      icon: material/brightness-4
+      name: Switch to light mode
+markdown_extensions:
+- attr_list
+- toc:
+    permalink: true
 """
 
-with open("mkdocs.yml", "w") as conf_file:
-    print(main_conf, file=conf_file)
+Path("mkdocs.yml").write_text(main_conf)
 
 
 # The home page.
@@ -63,10 +96,10 @@ hide:
 - navigation
 ---
 
-# Welcome to our gallery of MkDocs themes
+# Welcome to our gallery of MkDocs themes!
 
 <style>
-img {
+article img {
     -webkit-filter: drop-shadow(0px 16px 10px rgba(100,100,100,0.6));
     -moz-filter: drop-shadow(0px 16px 10px rgba(100,100,100,0.6));
     -ms-filter: drop-shadow(0px 16px 10px rgba(100,100,100,0.6)); 
@@ -79,7 +112,13 @@ img {
 Path("docs").mkdir(parents=True, exist_ok=True)
 with open("docs/index.md", "w") as index_page:
     print(index_contents, file=index_page)
-    for name, theme in themes:
-        img = f"![{name}](img/{theme}.png)"
-        link = f"[{img}](themes/{theme})"
-        print(f"## {name}\n\n{link}\n\n---\n\n", file=index_page)
+    print("## Built-in themes\n", file=index_page)
+    for theme in builtin_themes:
+        img = f"![{theme.name}](assets/img/{theme.mkdocs_id}.png)"
+        link = f"[{img}](themes/{theme.mkdocs_id}){{ title=\"Click to browse!\" }}"
+        print(f"### {theme.name}\n\n{link}\n\n---\n\n", file=index_page)
+    print("## Third-party themes\n", file=index_page)
+    for theme in themes:
+        img = f"![{theme.name}](assets/img/{theme.mkdocs_id}.png)"
+        link = f"[{img}](themes/{theme.mkdocs_id}){{ title=\"Click to browse!\" }}"
+        print(f"### {theme.name}\n\n{link}\n\n---\n\n", file=index_page)
