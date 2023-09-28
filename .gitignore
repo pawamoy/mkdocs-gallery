@@ -1,6 +1,7 @@
 .venv/
-logs/
-themes/
+/logs/
+/themes/
 site/
-docs/
-mkdocs.yml
+/docs/assets/img
+/docs/index.md
+/mkdocs.yml

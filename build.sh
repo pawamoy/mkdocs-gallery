@@ -34,7 +34,7 @@ if [ ${NO_THEMES} -eq 1 ]; then
     echo "Skipping themes building"
 else
     rm -rf site
-    mkdir -p logs docs/img site/themes &>/dev/null
+    mkdir -p logs site/themes &>/dev/null
 
     for theme in themes/*; do
         echo "Building ${theme}"
@@ -53,6 +53,7 @@ if [ ${NO_SHOTS} -eq 1 ]; then
     echo "Skipping screenshots"
 else
     echo "Taking screenshots"
+    mkdir -p docs/assets/img &>/dev/null
     for theme in site/themes/*; do
         shot-scraper "${theme}/index.html" -o "docs/assets/img/${theme##*/}.png"
     done
