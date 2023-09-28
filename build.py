@@ -230,11 +230,12 @@ def build_themes(themes: list[Theme]) -> None:
             with logs_dir.joinpath(f"{theme.mkdocs_id}.txt").open("w") as logs_file:
                 try:
                     subprocess.run(
-                        [venv_dir / "bin" / "mkdocs", "build", "-f", theme_dir / "mkdocs.yml"],
+                        [venv_dir / "bin" / "mkdocs", "build"],
                         stdout=logs_file,
                         stderr=logs_file,
                         check=True,
                         text=True,
+                        cwd=theme_dir,
                     )
                 except subprocess.CalledProcessError:
                     print("FAILED!")
