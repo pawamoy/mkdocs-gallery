@@ -31,6 +31,16 @@ builtin_themes = [
     Theme(name="ReadTheDocs", mkdocs_id="readthedocs"),
 ]
 
+# TODO: These themes need fixing or maybe removal from the catalog.
+broken_themes = {
+    "docskimmer",
+    "inspired",
+    "jinks_en",
+    "lantana",
+    "semantic",
+    "unidata",
+}
+
 
 # Fetch themes from MkDocs catalog.
 def get_themes() -> list[Theme]:
@@ -49,9 +59,13 @@ def get_themes() -> list[Theme]:
                 url = ""
             pypi_id = project.get("pypi_id", f"git+{url}")
             if isinstance(mkdocs_theme, str):
+                if mkdocs_theme in broken_themes:
+                    continue
                 themes.append(Theme(name=project["name"], url=url, pypi_id=pypi_id, mkdocs_id=mkdocs_theme))
             else:
                 for theme in mkdocs_theme:
+                    if theme in broken_themes:
+                        continue
                     themes.append(
                         Theme(name=f"{project['name']} - {theme.title()}", url=url, pypi_id=pypi_id, mkdocs_id=theme)
                     )
@@ -138,12 +152,12 @@ def prepare_main(themes: list[Theme]) -> None:
     Path("docs").mkdir(parents=True, exist_ok=True)
     with open("docs/index.md", "w") as index_page:
         print(index_contents, file=index_page)
-        print("## Built-in themes\n", file=index_page)
+        print("\n## Built-in themes\n", file=index_page)
         for theme in builtin_themes:
             img = f"![{theme.name}](assets/img/{theme.mkdocs_id}.png)"
             link = f'[{img}](themes/{theme.mkdocs_id}){{ title="Click to browse!" }}'
             print(f"### {theme.name}\n\n{link}\n\n---\n\n", file=index_page)
-        print("## Third-party themes\n", file=index_page)
+        print("\n## Third-party themes\n", file=index_page)
         for theme in themes:
             img = f"![{theme.name}](assets/img/{theme.mkdocs_id}.png)"
             link = f'[{img}](themes/{theme.mkdocs_id}){{ title="Click to browse!" }}'
@@ -177,7 +191,7 @@ def install_deps(theme: Theme) -> None:
         subprocess.run([venv_dir / "bin" / "pip", "install", *deps], check=False, stdout=devnull, stderr=devnull)
 
 
-# Build a theme site.
+# Build theme sites.
 def build_themes(themes: list[Theme]) -> None:
     parser = argparse.ArgumentParser(prog="build.py")
     parser.add_argument(
@@ -225,7 +239,6 @@ def build_themes(themes: list[Theme]) -> None:
 
         def _build_theme(theme: Theme) -> None:
             theme_dir = Path("themes", theme.mkdocs_id)
-            venv_dir = theme_dir / ".venv"
             print(f"Building {theme.name}")
             with logs_dir.joinpath(f"{theme.mkdocs_id}.txt").open("w") as logs_file:
                 try:
