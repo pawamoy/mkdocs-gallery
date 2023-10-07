@@ -1,5 +1,5 @@
-site_name: {{ site_name }}
-theme: {{ theme }}
+site_name: {{ theme.name }}
+theme: {{ theme.mkdocs_id }}
 
 markdown_extensions:
 - attr_list
@@ -49,6 +49,6 @@ nav:
 - Gallery: ../../
 - Python package docs: reference.md
 - Themes:
-{% for theme in themes %}
+{%- for theme in themes %}
   - "{{ theme.name }}": ../{{ theme.mkdocs_id }}
-{% endfor %}
+{%- endfor %}
