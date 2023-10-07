@@ -160,19 +160,19 @@ def install_deps(theme: Theme) -> None:
     #     projects_file_url="https://raw.githubusercontent.com/mkdocs/catalog/main/projects.yaml",
     #     config_file_path=theme_dir / "mkdocs.yml"
     # )
-    with open(os.devnull, "w") as devnull:
-        deps = (
-            subprocess.run(
-                [sys.executable, "-mmkdocs", "get-deps", "-f", theme_dir / "mkdocs.yml"],
-                check=False,
-                stdout=subprocess.PIPE,
-                stderr=devnull,
-                text=True,
-            )
-            .stdout.strip()
-            .split("\n")
-        )
-        subprocess.run([venv_dir / "bin" / "pip", "install", *deps], check=False, stdout=devnull, stderr=devnull)
+    deps = subprocess.run(
+        [sys.executable, "-mmkdocs", "get-deps", "-f", theme_dir / "mkdocs.yml"],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+    ).stdout.splitlines()
+    subprocess.run(
+        [venv_dir / "bin" / "pip", "install", *deps],
+        check=False,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
 
 
 # Build theme sites.
