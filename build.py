@@ -12,8 +12,6 @@ from textwrap import dedent
 import httpx
 import yaml
 from jinja2 import Environment
-from mkdocs.commands.build import build as mkdocs_build
-from mkdocs.config import load_config
 from shot_scraper.cli import cli as shot_scraper
 from tqdm import tqdm
 
@@ -261,12 +259,7 @@ def build_themes(themes: list[Theme]) -> None:
 # Build main documentation site.
 def build_main() -> None:
     print("Building gallery's main site")
-    mkdocs_config = load_config()
-    mkdocs_config["plugins"].run_event("startup", command="build", dirty=False)
-    try:
-        mkdocs_build(mkdocs_config, dirty=True)
-    finally:
-        mkdocs_config["plugins"].run_event("shutdown")
+    subprocess.run([sys.executable, "-mmkdocs", "build", "--dirty"], check=True)
 
 
 # Run everything.
