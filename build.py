@@ -31,16 +31,6 @@ builtin_themes = [
     Theme(name="ReadTheDocs", mkdocs_id="readthedocs"),
 ]
 
-# TODO: These themes need fixing or maybe removal from the catalog.
-broken_themes = {
-    "docskimmer",
-    "inspired",
-    "jinks_en",
-    "lantana",
-    "semantic",
-    "unidata",
-}
-
 
 # Fetch themes from MkDocs catalog.
 def get_themes() -> list[Theme]:
@@ -59,13 +49,9 @@ def get_themes() -> list[Theme]:
                 url = ""
             pypi_id = project.get("pypi_id", f"git+{url}")
             if isinstance(mkdocs_theme, str):
-                if mkdocs_theme in broken_themes:
-                    continue
                 themes.append(Theme(name=project["name"], url=url, pypi_id=pypi_id, mkdocs_id=mkdocs_theme))
             else:
                 for theme in mkdocs_theme:
-                    if theme in broken_themes:
-                        continue
                     themes.append(
                         Theme(name=f"{project['name']} - {theme.title()}", url=url, pypi_id=pypi_id, mkdocs_id=theme)
                     )
