@@ -23,11 +23,6 @@ markdown_extensions:
 
 plugins:
 - search
-- gen-files:
-    scripts: [scripts/gen_ref_nav.py]
-- literate-nav:
-    nav_file: SUMMARY.md
-- section-index
 - mkdocstrings:
     handlers:
       python:
@@ -52,7 +47,7 @@ plugins:
 
 nav:
 - Gallery: ../../
-- Python package docs: reference/
+- Python package docs: reference.md
 - Themes:
 {% for theme in themes %}
   - "{{ theme.name }}": ../{{ theme.mkdocs_id }}
