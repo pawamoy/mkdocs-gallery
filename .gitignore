@@ -2,8 +2,7 @@
 /logs/
 /themes/
 site/
-/docs/assets/img
-/docs/index.md
+/docs/
 /mkdocs.yml
 .ruff_cache/
 __pycache__/
