@@ -13,6 +13,7 @@ import yaml
 from jinja2 import Environment
 from shot_scraper.cli import cli as shot_scraper
 from tqdm import tqdm
+import mkdocs_get_deps
 
 
 @dataclass
@@ -100,18 +101,7 @@ def install_deps(theme: Theme) -> None:
     venv_dir = theme_dir / ".venv"
     if not venv_dir.exists():
         venv.create(venv_dir, with_pip=True)
-    # NOTE: If `get_deps` returns a list at some point, we could use this instead of a subprocess:
-    # deps = get_deps(
-    #     projects_file_url="https://raw.githubusercontent.com/mkdocs/catalog/main/projects.yaml",
-    #     config_file_path=theme_dir / "mkdocs.yml"
-    # )
-    deps = subprocess.run(
-        [sys.executable, "-mmkdocs", "get-deps", "-f", theme_dir / "mkdocs.yml"],
-        check=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
-        text=True,
-    ).stdout.splitlines()
+    deps = mkdocs_get_deps.get_deps(config_file=theme_dir / "mkdocs.yml")
     subprocess.run(
         [venv_dir / "bin" / "pip", "install", *deps],
         check=False,
