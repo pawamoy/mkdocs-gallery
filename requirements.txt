@@ -1,5 +1,6 @@
 httpx
 pyyaml
+mkdocs-get-deps
 mkdocs-material
 shot-scraper
 jinja2
