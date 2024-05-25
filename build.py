@@ -100,13 +100,25 @@ def install_deps(theme: Theme) -> None:
     theme_dir = Path("themes", theme.mkdocs_id)
     venv_dir = theme_dir / ".venv"
     if not venv_dir.exists():
-        venv.create(venv_dir, with_pip=True)
+        subprocess.run(
+            [sys.executable, "-muv", "venv", "--seed", venv_dir],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
     deps = mkdocs_get_deps.get_deps(config_file=theme_dir / "mkdocs.yml")
     subprocess.run(
-        [venv_dir / "bin" / "pip", "install", *deps],
-        check=False,
+        [venv_dir / "bin" / "pip", "install", "uv"],
+        check=True,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
+    )
+    subprocess.run(
+        [venv_dir / "bin" / "uv", "pip", "install", *deps],
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        env={"VIRTUAL_ENV": str(venv_dir)},
     )
 
 

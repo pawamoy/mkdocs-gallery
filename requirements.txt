@@ -5,3 +5,4 @@ mkdocs-material
 shot-scraper
 jinja2
 tqdm
+uv
