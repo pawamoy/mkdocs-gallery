@@ -186,7 +186,9 @@ def build_themes(themes: list[Theme]) -> None:
                 shot_scraper(
                     [f"site/themes/{theme.mkdocs_id}/index.html", "-o", f"docs/assets/img/{theme.mkdocs_id}.png"]
                 )
-            except:
+            except Exception as error:
+                print(error)
+            except BaseException:
                 pass
 
 
