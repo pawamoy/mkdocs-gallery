@@ -3,7 +3,6 @@ import os
 import shutil
 import subprocess
 import sys
-import venv
 from dataclasses import dataclass
 from multiprocessing import Pool
 from pathlib import Path
@@ -122,6 +121,36 @@ def install_deps(theme: Theme) -> None:
     )
 
 
+
+def _build_theme(theme: Theme) -> None:
+    theme_dir = Path("themes", theme.mkdocs_id).absolute()
+    dest_dir = Path("site", "themes", theme.mkdocs_id).absolute()
+    print(f"Building {theme.name}")
+    with logs_dir.joinpath(f"{theme.mkdocs_id}.txt").open("w") as logs_file:
+        try:
+            subprocess.run(
+                [theme_dir.joinpath(".venv", "bin", "mkdocs"), "build", "-d", dest_dir],
+                stdout=logs_file,
+                stderr=logs_file,
+                check=True,
+                text=True,
+                cwd=theme_dir,
+            )
+        except subprocess.CalledProcessError:
+            print("FAILED!")
+
+
+def _take_screenshot(theme: Theme) -> None:
+    try:
+        shot_scraper(
+            [f"site/themes/{theme.mkdocs_id}/index.html", "-o", f"docs/assets/img/{theme.mkdocs_id}.png"]
+        )
+    except Exception as error:
+        print(error)
+    except BaseException:
+        pass
+
+
 # Build theme sites.
 def build_themes(themes: list[Theme]) -> None:
     parser = argparse.ArgumentParser(prog="build.py")
@@ -163,45 +192,19 @@ def build_themes(themes: list[Theme]) -> None:
     if not opts.build_themes:
         print("Skipping themes building")
     else:
-        logs_dir = Path("logs")
-        logs_dir.mkdir(exist_ok=True)
         shutil.rmtree(Path("site", "themes"), ignore_errors=True)
         Path("site", "themes").mkdir(parents=True)
-
-        def _build_theme(theme: Theme) -> None:
-            theme_dir = Path("themes", theme.mkdocs_id).absolute()
-            dest_dir = Path("site", "themes", theme.mkdocs_id).absolute()
-            print(f"Building {theme.name}")
-            with logs_dir.joinpath(f"{theme.mkdocs_id}.txt").open("w") as logs_file:
-                try:
-                    subprocess.run(
-                        [theme_dir.joinpath(".venv", "bin", "mkdocs"), "build", "-d", dest_dir],
-                        stdout=logs_file,
-                        stderr=logs_file,
-                        check=True,
-                        text=True,
-                        cwd=theme_dir,
-                    )
-                except subprocess.CalledProcessError:
-                    print("FAILED!")
-
-        for theme in themes:
-            _build_theme(theme)
+        with Pool(len(os.sched_getaffinity(0))) as pool:
+            tuple(pool.imap(_build_theme, themes))
 
     if not opts.take_screenshots:
         print("Skipping screenshots")
     else:
         print("Taking screenshots")
         Path("docs", "assets", "img").mkdir(parents=True, exist_ok=True)
-        for theme in tqdm(themes):
-            try:
-                shot_scraper(
-                    [f"site/themes/{theme.mkdocs_id}/index.html", "-o", f"docs/assets/img/{theme.mkdocs_id}.png"]
-                )
-            except Exception as error:
-                print(error)
-            except BaseException:
-                pass
+
+        with Pool(len(os.sched_getaffinity(0))) as pool:
+            tuple(pool.imap(_take_screenshot, themes))
 
 
 # Build main documentation site.
@@ -210,8 +213,11 @@ def build_main() -> None:
     subprocess.run([sys.executable, "-mmkdocs", "build", "--dirty"], check=True)
 
 
+logs_dir = Path("logs")
+
 # Run everything.
 def main() -> None:
+    logs_dir.mkdir(exist_ok=True)
     themes = get_themes()
     prepare_themes(themes)
     prepare_main(themes)
