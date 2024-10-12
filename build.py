@@ -118,7 +118,7 @@ def install_deps(theme: Theme) -> None:
         check=True,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
-        env={"VIRTUAL_ENV": str(venv_dir)},
+        env={"VIRTUAL_ENV": str(venv_dir), "UV_PROJECT_ENVIRONMENT": str(venv_dir)},
     )
 
 
