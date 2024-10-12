@@ -45,7 +45,7 @@ jobs:
           path: site
 
   deploy:
-    if: github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == github.event.repository.default_branch
     needs: build
     concurrency:
       group: "pages"
